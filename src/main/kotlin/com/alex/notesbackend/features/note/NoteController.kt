@@ -1,10 +1,11 @@
 package com.alex.notesbackend.features.note
 
 import com.alex.notesbackend.exception.ResourceNotFoundException
+import com.alex.notesbackend.features.note.model.NoteCreateRequest
+import com.alex.notesbackend.features.note.model.NotePutRequest
 import com.alex.notesbackend.repository.note.DbModelNote
 import com.alex.notesbackend.repository.note.NoteDao
 import com.alex.notesbackend.repository.session.SessionDao
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -18,64 +19,77 @@ class NoteController(
 
     // create
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("v1/notes")
-    fun create(@RequestBody note: DbModelNote): DbModelNote {
-        val date = Date().time
-        note.apply {
-            createdAt = date
-            updatedAt = date
-        }
-        return noteDao.save(note)
+    fun create(
+        @RequestHeader("Authorization") token: String,
+        @RequestBody noteRequest: NoteCreateRequest,
+        @RequestAttribute("user_id") userId: Long): DbModelNote {
+        return Date()
+            .time
+            .let { date ->
+                DbModelNote(
+                    0,
+                    userId,
+                    noteRequest.title,
+                    noteRequest.description,
+                    date,
+                    date)
+            }.let { noteDb -> noteDao.save(noteDb) }
     }
 
     // read
 
     @GetMapping("v1/notes")
     fun getAllV1(): ResponseEntity<List<DbModelNote>> {
-        val headers = HttpHeaders().apply { add("Deprecated", "true") }
-        return ResponseEntity(noteDao.findAll(), headers, HttpStatus.OK)
+        return HttpHeaders()
+            .apply { add("Deprecated", "true") }
+            .let { headers -> ResponseEntity(noteDao.findAll(), headers, HttpStatus.OK) }
     }
 
     @GetMapping("v2/notes")
     fun getAll(
         @RequestParam sort: String?,
         @RequestParam offset: Int?,
-        @RequestParam limit: Int?): List<DbModelNote> {
+        @RequestParam limit: Int?,
+        @RequestAttribute("user_id") userId: Long): List<DbModelNote> {
 
-        //sort?.toSortPair(), offset, limit)
-        return noteDao.findAll()
+        return noteDao.findAllByUserId(userId)
     }
 
     @GetMapping("v1/notes/{id}")
-    fun get(@PathVariable id: Long): DbModelNote {
-        return noteDao.findByIdOrNull(id) ?: throw ResourceNotFoundException()
+    fun get(@PathVariable id: Long, @RequestAttribute("user_id") userId: Long): DbModelNote {
+        return noteDao.findByIdAndUserId(id, userId) ?: throw ResourceNotFoundException("Note not found")
     }
 
     // update
 
     @PutMapping("v1/notes/{id}")
-    fun update(@PathVariable id: Long, @RequestBody noteRequest: DbModelNote): DbModelNote {
+    fun update(
+        @PathVariable id: Long,
+        @RequestBody noteRequest: NotePutRequest,
+        @RequestAttribute("user_id") userId: Long): DbModelNote {
         return noteDao
-            .findByIdOrNull(id)
+            .findByIdAndUserId(id, userId)
             ?.run {
-                title = noteRequest.title
-                description = noteRequest.description
+                if (noteRequest.title != null) title = noteRequest.title
+                if (noteRequest.description != null) description = noteRequest.description
                 updatedAt = Date().time
                 noteDao.save(this)
-            } ?: throw ResourceNotFoundException()
+            } ?: throw ResourceNotFoundException("Note not found")
     }
 
     // delete
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("v1/notes")
-    fun deleteAll(): ResponseEntity<Unit> {
-        noteDao.deleteAll()
-        return ResponseEntity(null, HttpStatus.NO_CONTENT)
+    fun deleteAll(@RequestAttribute("user_id") userId: Long) {
+        noteDao.deleteByUserId(userId)
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("v1/notes/{id}")
-    fun delete(@PathVariable id: Long): ResponseEntity<Unit> {
-        noteDao.deleteById(id)
-        return ResponseEntity(null, HttpStatus.NO_CONTENT)
+    fun delete(@PathVariable id: Long, @RequestAttribute("user_id") userId: Long) {
+        noteDao.deleteByIdAndUserId(id, userId)
     }
 }

@@ -1,3 +1,3 @@
 package com.alex.notesbackend.exception
 
-class UnauthorizedException : RuntimeException()
+class UnauthorizedException(override val message: String) : RuntimeException(message)

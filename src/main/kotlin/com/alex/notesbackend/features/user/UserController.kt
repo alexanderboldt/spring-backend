@@ -1,6 +1,6 @@
 package com.alex.notesbackend.features.user
 
-import com.alex.notesbackend.features.user.model.LoginPost
+import com.alex.notesbackend.features.user.model.LoginPostRequest
 import com.alex.notesbackend.features.user.model.LoginPostResponse
 import com.alex.notesbackend.repository.session.DbModelSession
 import com.alex.notesbackend.repository.session.SessionDao
@@ -18,9 +18,9 @@ class UserController(
     private val sessionDao: SessionDao) {
 
     @PostMapping("v1/login")
-    fun login(@RequestBody login: LoginPost): ResponseEntity<LoginPostResponse> {
+    fun login(@RequestBody loginRequest: LoginPostRequest): ResponseEntity<LoginPostResponse> {
         return userDao
-            .findByUsernameAndPassword(login.username, login.password)
+            .findByUsernameAndPassword(loginRequest.username, loginRequest.password)
             ?.let { user -> sessionDao.save(DbModelSession(0, user.id, Random.nextInt(100000, 999999).toString())) }
             ?.let { session -> ResponseEntity(LoginPostResponse(session.token), HttpStatus.OK) }
             ?: ResponseEntity(null, HttpStatus.NOT_FOUND)

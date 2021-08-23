@@ -13,6 +13,6 @@ class AuthorizationInterceptor : HandlerInterceptor {
         return request
             .getHeader("Client-Secret")
             ?.let { if (it == hash) true else null }
-            ?: throw UnauthorizedException()
+            ?: throw UnauthorizedException("Client-Secret missing")
     }
 }

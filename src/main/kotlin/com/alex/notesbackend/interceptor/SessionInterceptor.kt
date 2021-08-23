@@ -2,10 +2,7 @@ package com.alex.notesbackend.interceptor
 
 import com.alex.notesbackend.exception.UnauthorizedException
 import com.alex.notesbackend.repository.session.SessionDao
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
+import com.alex.notesbackend.utils.getBearerToken
 import org.springframework.web.servlet.HandlerInterceptor
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -15,9 +12,12 @@ class SessionInterceptor(private val sessionDao: SessionDao) : HandlerIntercepto
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
         if (request.requestURL.contains("login")) return true
 
-        return request
+        request
             .getHeader("Authorization")
-            ?.let { if (sessionDao.findByToken(it.drop(7)) != null) true else null }
-            ?: throw UnauthorizedException()
+            ?.let { token -> sessionDao.findByToken(token.getBearerToken()) }
+            ?.let { session -> request.setAttribute("user_id", session.userId) }
+            ?: throw UnauthorizedException("User not found")
+
+        return true
     }
 }

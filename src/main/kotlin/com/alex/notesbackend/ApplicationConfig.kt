@@ -3,7 +3,6 @@ package com.alex.notesbackend
 import com.alex.notesbackend.interceptor.AuthorizationInterceptor
 import com.alex.notesbackend.interceptor.SessionInterceptor
 import com.alex.notesbackend.repository.session.SessionDao
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer

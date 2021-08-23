@@ -1,3 +1,3 @@
 package com.alex.notesbackend.exception
 
-class ResourceNotFoundException : RuntimeException()
+class ResourceNotFoundException(override val message: String) : RuntimeException(message)

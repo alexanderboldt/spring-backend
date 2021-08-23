@@ -9,6 +9,9 @@ data class DbModelNote(
     var id: Long,
 
     @Column(nullable = false)
+    var userId: Long,
+
+    @Column(nullable = false)
     var title: String,
 
     var description: String?,

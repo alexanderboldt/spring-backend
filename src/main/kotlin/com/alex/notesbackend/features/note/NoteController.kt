@@ -6,6 +6,8 @@ import com.alex.notesbackend.features.note.model.NotePutRequest
 import com.alex.notesbackend.repository.note.DbModelNote
 import com.alex.notesbackend.repository.note.NoteDao
 import com.alex.notesbackend.repository.session.SessionDao
+import com.alex.notesbackend.utils.toSortPairs
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -54,7 +56,16 @@ class NoteController(
         @RequestParam limit: Int?,
         @RequestAttribute("user_id") userId: Long): List<DbModelNote> {
 
-        return noteDao.findAllByUserId(userId)
+        val sort = sort
+            ?.toSortPairs()
+            ?.map { (sortString, isAscending) ->
+                Sort.Order(if (isAscending) Sort.Direction.ASC else Sort.Direction.DESC, sortString)
+            }.let { sortList -> Sort.by(sortList ?: emptyList()) }
+
+        return noteDao
+            .findAllByUserId(userId, sort)
+            .let { notes -> if (offset != null && offset >= 1) notes.drop(offset) else notes }
+            .let { notes -> if (limit != null && limit >= 1) notes.take(limit) else notes }
     }
 
     @GetMapping("v1/notes/{id}")

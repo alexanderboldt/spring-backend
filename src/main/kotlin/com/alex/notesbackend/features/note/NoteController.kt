@@ -6,7 +6,7 @@ import com.alex.notesbackend.features.note.model.NotePutRequest
 import com.alex.notesbackend.repository.note.DbModelNote
 import com.alex.notesbackend.repository.note.NoteDao
 import com.alex.notesbackend.repository.session.SessionDao
-import com.alex.notesbackend.utils.toSortPairs
+import com.alex.notesbackend.utils.ATTRIBUTE_USER_ID
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -24,9 +24,8 @@ class NoteController(
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("v1/notes")
     fun create(
-        @RequestHeader("Authorization") token: String,
         @RequestBody noteRequest: NoteCreateRequest,
-        @RequestAttribute("user_id") userId: Long): DbModelNote {
+        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long): DbModelNote {
         return Date()
             .time
             .let { date ->
@@ -51,25 +50,19 @@ class NoteController(
 
     @GetMapping("v2/notes")
     fun getAll(
-        @RequestParam sort: String?,
+        @RequestParam sort: Sort?,
         @RequestParam offset: Int?,
         @RequestParam limit: Int?,
-        @RequestAttribute("user_id") userId: Long): List<DbModelNote> {
-
-        val sort = sort
-            ?.toSortPairs()
-            ?.map { (sortString, isAscending) ->
-                Sort.Order(if (isAscending) Sort.Direction.ASC else Sort.Direction.DESC, sortString)
-            }.let { sortList -> Sort.by(sortList ?: emptyList()) }
+        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long): List<DbModelNote> {
 
         return noteDao
-            .findAllByUserId(userId, sort)
+            .findAllByUserId(userId, sort ?: Sort.by(emptyList()))
             .let { notes -> if (offset != null && offset >= 1) notes.drop(offset) else notes }
             .let { notes -> if (limit != null && limit >= 1) notes.take(limit) else notes }
     }
 
     @GetMapping("v1/notes/{id}")
-    fun get(@PathVariable id: Long, @RequestAttribute("user_id") userId: Long): DbModelNote {
+    fun get(@PathVariable id: Long, @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long): DbModelNote {
         return noteDao.findByIdAndUserId(id, userId) ?: throw ResourceNotFoundException("Note not found")
     }
 
@@ -79,7 +72,7 @@ class NoteController(
     fun update(
         @PathVariable id: Long,
         @RequestBody noteRequest: NotePutRequest,
-        @RequestAttribute("user_id") userId: Long): DbModelNote {
+        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long): DbModelNote {
         return noteDao
             .findByIdAndUserId(id, userId)
             ?.run {
@@ -94,13 +87,13 @@ class NoteController(
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("v1/notes")
-    fun deleteAll(@RequestAttribute("user_id") userId: Long) {
+    fun deleteAll(@RequestAttribute(ATTRIBUTE_USER_ID) userId: Long) {
         noteDao.deleteByUserId(userId)
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("v1/notes/{id}")
-    fun delete(@PathVariable id: Long, @RequestAttribute("user_id") userId: Long) {
+    fun delete(@PathVariable id: Long, @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long) {
         noteDao.deleteByIdAndUserId(id, userId)
     }
 }

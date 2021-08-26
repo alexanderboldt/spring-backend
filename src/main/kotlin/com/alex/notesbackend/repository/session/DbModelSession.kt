@@ -15,5 +15,8 @@ data class DbModelSession(
     val userId: Long,
 
     @Column(nullable = false)
+    val type: String,
+
+    @Column(nullable = false)
     val token: String
 )

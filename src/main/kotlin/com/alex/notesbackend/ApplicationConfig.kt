@@ -23,7 +23,7 @@ class ApplicationConfig(private val sessionDao: SessionDao) : WebMvcConfigurer {
         super.addInterceptors(registry)
         registry.apply {
             addInterceptor(AuthorizationInterceptor())
-            addInterceptor(SessionInterceptor(sessionDao))
+            addInterceptor(SessionInterceptor(sessionDao)).excludePathPatterns("/v1/login/**")
         }
     }
 }

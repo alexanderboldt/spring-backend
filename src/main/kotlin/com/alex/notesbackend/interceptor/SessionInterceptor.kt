@@ -11,11 +11,11 @@ import javax.servlet.http.HttpServletResponse
 class SessionInterceptor(private val sessionDao: SessionDao) : HandlerInterceptor {
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        if (request.requestURL.contains("login")) return true
-
         request
             .getHeader(HEADER_AUTHORIZATION)
-            ?.let { token -> sessionDao.findByToken(token.drop(7)) }
+            .split(" ")
+            .let { it[0] to it[1] }
+            .let { (type, token) -> sessionDao.findByTypeAndToken(type, token) }
             ?.let { session -> request.setAttribute(ATTRIBUTE_USER_ID, session.userId) }
             ?: throw UnauthorizedException("User not found")
 

@@ -17,15 +17,17 @@ import java.util.*
 @RestController
 class NoteController(
     private val noteDao: NoteDao,
-    private val sessionDao: SessionDao) {
+    private val sessionDao: SessionDao
+) {
 
     // create
 
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("v1/notes")
+    @PostMapping("/v1/notes")
     fun create(
         @RequestBody noteRequest: NoteCreateRequest,
-        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long): DbModelNote {
+        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long
+    ): DbModelNote {
         return Date()
             .time
             .let { date ->
@@ -35,13 +37,14 @@ class NoteController(
                     noteRequest.title,
                     noteRequest.description,
                     date,
-                    date)
+                    date
+                )
             }.let { noteDb -> noteDao.save(noteDb) }
     }
 
     // read
 
-    @GetMapping("v1/notes")
+    @GetMapping("/v1/notes")
     fun getAllV1(): ResponseEntity<List<DbModelNote>> {
         return HttpHeaders()
             .apply { add("Deprecated", "true") }
@@ -53,8 +56,8 @@ class NoteController(
         @RequestParam sort: Sort?,
         @RequestParam offset: Int?,
         @RequestParam limit: Int?,
-        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long): List<DbModelNote> {
-
+        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long
+    ): List<DbModelNote> {
         return noteDao
             .findAllByUserId(userId, sort ?: Sort.by(emptyList()))
             .let { notes -> if (offset != null && offset >= 1) notes.drop(offset) else notes }
@@ -72,7 +75,8 @@ class NoteController(
     fun update(
         @PathVariable id: Long,
         @RequestBody noteRequest: NotePutRequest,
-        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long): DbModelNote {
+        @RequestAttribute(ATTRIBUTE_USER_ID) userId: Long
+    ): DbModelNote {
         return noteDao
             .findByIdAndUserId(id, userId)
             ?.run {

@@ -8,12 +8,14 @@ import javax.servlet.http.HttpServletResponse
 
 class AuthorizationInterceptor : HandlerInterceptor {
 
-    override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        val hash = "e4bbe5b7a4c1eb55652965aee885dd59bd2ee7f4"
+    private val clientSecret = "e4bbe5b7a4c1eb55652965aee885dd59bd2ee7f4"
 
-        return request
-            .getHeader(HEADER_CLIENT_SECRET)
-            ?.let { if (it == hash) true else null }
-            ?: throw UnauthorizedException("Client-Secret missing")
+    // ----------------------------------------------------------------------------
+
+    override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
+        when (request.getHeader(HEADER_CLIENT_SECRET) == clientSecret) {
+            true -> return true
+            else -> throw UnauthorizedException("Client-Secret missing")
+        }
     }
 }

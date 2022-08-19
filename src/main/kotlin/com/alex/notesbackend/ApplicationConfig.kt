@@ -1,6 +1,7 @@
 package com.alex.notesbackend
 
 import com.alex.notesbackend.converter.SortConverter
+import com.alex.notesbackend.features.user.UserController
 import com.alex.notesbackend.interceptor.AuthorizationInterceptor
 import com.alex.notesbackend.interceptor.SessionInterceptor
 import com.alex.notesbackend.repository.session.SessionDao
@@ -23,7 +24,7 @@ class ApplicationConfig(private val sessionDao: SessionDao) : WebMvcConfigurer {
         super.addInterceptors(registry)
         registry.apply {
             addInterceptor(AuthorizationInterceptor())
-            addInterceptor(SessionInterceptor(sessionDao)).excludePathPatterns("/v1/login/**")
+            addInterceptor(SessionInterceptor(sessionDao)).excludePathPatterns(UserController.loginPath)
         }
     }
 }

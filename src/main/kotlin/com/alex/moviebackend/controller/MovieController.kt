@@ -7,13 +7,14 @@ import com.alex.moviebackend.repository.api.movie.ApiModelMoviePost
 import com.alex.moviebackend.repository.api.movie.ApiModelMoviePut
 import com.alex.moviebackend.repository.database.movie.DbModelMovie
 import com.alex.moviebackend.repository.database.movie.MovieRepository
+import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.Date
 
 @RestController
-@RequestMapping("/movies")
+@RequestMapping("/api/v1/movies")
 class MovieController(private val movieRepository: MovieRepository) {
 
     private val textMovieNotFoundWithGivenId = "Movie with the given id not found!"
@@ -31,7 +32,17 @@ class MovieController(private val movieRepository: MovieRepository) {
     // read
 
     @GetMapping
-    fun getAllMovies() = movieRepository.findAll().toApiModelGet()
+    fun getAllMovies(
+        @RequestParam sort: Sort?,
+        @RequestParam offset: Int?,
+        @RequestParam limit: Int?,
+    ): List<ApiModelMovieGet> {
+        return movieRepository
+            .findAllSorted(sort ?: Sort.by("id"))
+            .let { movies -> if (offset != null && offset >= 1) movies.drop(offset) else movies }
+            .let { movies -> if (limit != null && limit >= 1) movies.take(limit) else movies }
+            .toApiModelGet()
+    }
 
     @GetMapping("{id}")
     fun getMovie(@PathVariable("id") id: Long): ApiModelMovieGet {

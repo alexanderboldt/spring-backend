@@ -1,4 +1,4 @@
-package com.alex.notesbackend.repository.user
+package com.alex.moviebackend.repository
 
 import javax.persistence.Column
 import javax.persistence.Entity
@@ -6,14 +6,14 @@ import javax.persistence.GeneratedValue
 import javax.persistence.Id
 
 @Entity
-data class DbModelUser(
+data class DbModelMovie(
     @Id
     @GeneratedValue
     val id: Long,
 
-    @Column(nullable = false)
-    val username: String,
+    val title: String,
 
-    @Column(nullable = false)
-    val password: String
+    val description: String?,
+
+    val createdAt: Long
 )

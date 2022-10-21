@@ -1,6 +1,6 @@
-package com.alex.notesbackend.exception
+package com.alex.moviebackend.exception
 
-import com.alex.notesbackend.exception.model.ErrorResponse
+import com.alex.moviebackend.exception.model.ErrorResponse
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus

@@ -1,4 +1,4 @@
-package com.alex.moviebackend.repository
+package com.alex.moviebackend.repository.database.movie
 
 import javax.persistence.Column
 import javax.persistence.Entity

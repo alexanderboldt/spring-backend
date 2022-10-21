@@ -1,6 +1,6 @@
 package com.alex.moviebackend.exception
 
-import com.alex.moviebackend.exception.model.ErrorResponse
+import com.alex.moviebackend.repository.api.ApiModelErrorGet
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -12,5 +12,5 @@ class BadRequestAdvice {
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    fun handleException() = ErrorResponse(HttpStatus.BAD_REQUEST.value(), "Bad Request")
+    fun handleException() = ApiModelErrorGet(HttpStatus.BAD_REQUEST.value(), "Bad Request")
 }

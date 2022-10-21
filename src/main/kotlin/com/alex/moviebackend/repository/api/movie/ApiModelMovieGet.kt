@@ -1,6 +1,6 @@
-package com.alex.moviebackend.controller
+package com.alex.moviebackend.repository.api.movie
 
-data class RestModelMovieGet(
+data class ApiModelMovieGet(
     val id: Long,
     val title: String,
     val description: String?,

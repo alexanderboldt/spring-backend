@@ -1,4 +1,4 @@
-package com.alex.moviebackend.repository
+package com.alex.moviebackend.repository.database.movie
 
 import org.springframework.data.repository.CrudRepository
 

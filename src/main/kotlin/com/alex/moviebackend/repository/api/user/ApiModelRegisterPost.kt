@@ -1,7 +1,6 @@
 package com.alex.moviebackend.repository.api.user
 
-data class ApiModelUserGet(
-    val id: Long,
+data class ApiModelRegisterPost(
     val username: String,
-    val createdAt: Long
+    val password: String
 )

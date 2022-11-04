@@ -7,4 +7,4 @@ import com.alex.moviebackend.repository.database.user.DbModelUser
 
 fun Iterable<DbModelUser>.toApiModelGet() = map { it.toApiModelGet() }
 
-fun DbModelUser.toApiModelGet() = ApiModelUserGet(id, username)
+fun DbModelUser.toApiModelGet() = ApiModelUserGet(id, username, createdAt)

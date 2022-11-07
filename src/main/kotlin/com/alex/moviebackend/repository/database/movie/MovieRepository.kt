@@ -6,6 +6,7 @@ import org.springframework.data.repository.CrudRepository
 
 interface MovieRepository : CrudRepository<DbModelMovie, Long> {
 
-    @Query("from DbModelMovie")
-    fun findAllSorted(sort: Sort): List<DbModelMovie>
+    fun findAllByUserId(userId: Long, sort: Sort): List<DbModelMovie>
+
+    fun findByIdAndUserId(id: Long, userId: Long): DbModelMovie?
 }

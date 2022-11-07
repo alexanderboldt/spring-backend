@@ -8,7 +8,6 @@ import com.alex.moviebackend.repository.api.movie.ApiModelMoviePut
 import com.alex.moviebackend.repository.database.movie.DbModelMovie
 import com.alex.moviebackend.repository.database.movie.MovieRepository
 import org.springframework.data.domain.Sort
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.util.Date
@@ -23,9 +22,9 @@ class MovieController(private val movieRepository: MovieRepository) {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun postMovie(@RequestBody request: ApiModelMoviePost): ApiModelMovieGet {
+    fun postMovie(@RequestBody request: ApiModelMoviePost, @RequestAttribute userId: Long): ApiModelMovieGet {
         return movieRepository
-            .save(DbModelMovie(0, request.title, request.description, Date().time))
+            .save(DbModelMovie(0, userId, request.title, request.description, Date().time))
             .toApiModelGet()
     }
 
@@ -36,18 +35,19 @@ class MovieController(private val movieRepository: MovieRepository) {
         @RequestParam sort: Sort?,
         @RequestParam offset: Int?,
         @RequestParam limit: Int?,
+        @RequestAttribute userId: Long
     ): List<ApiModelMovieGet> {
         return movieRepository
-            .findAllSorted(sort ?: Sort.by("id"))
+            .findAllByUserId(userId, sort ?: Sort.by("id"))
             .let { movies -> if (offset != null && offset >= 1) movies.drop(offset) else movies }
             .let { movies -> if (limit != null && limit >= 1) movies.take(limit) else movies }
             .toApiModelGet()
     }
 
     @GetMapping("{id}")
-    fun getMovie(@PathVariable("id") id: Long): ApiModelMovieGet {
+    fun getMovie(@PathVariable("id") id: Long, @RequestAttribute userId: Long): ApiModelMovieGet {
         return movieRepository
-            .findByIdOrNull(id)
+            .findByIdAndUserId(id, userId)
             ?.toApiModelGet()
             ?: throw ResourceNotFoundException(textMovieNotFoundWithGivenId)
     }
@@ -55,11 +55,13 @@ class MovieController(private val movieRepository: MovieRepository) {
     // update
 
     @PutMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
     fun update(
         @PathVariable("id") id: Long,
-        @RequestBody request: ApiModelMoviePut
+        @RequestBody request: ApiModelMoviePut,
+        @RequestAttribute userId: Long
     ): ApiModelMovieGet {
-        val movie = movieRepository.findByIdOrNull(id) ?: throw ResourceNotFoundException(textMovieNotFoundWithGivenId)
+        val movie = movieRepository.findByIdAndUserId(id, userId) ?: throw ResourceNotFoundException(textMovieNotFoundWithGivenId)
 
         return movieRepository.save(
             movie.copy(
@@ -73,8 +75,8 @@ class MovieController(private val movieRepository: MovieRepository) {
 
     @DeleteMapping("{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun deleteMovie(@PathVariable("id") id: Long) {
-        movieRepository.findByIdOrNull(id) ?: throw ResourceNotFoundException(textMovieNotFoundWithGivenId)
+    fun deleteMovie(@PathVariable("id") id: Long, @RequestAttribute userId: Long) {
+        movieRepository.findByIdAndUserId(id, userId) ?: throw ResourceNotFoundException(textMovieNotFoundWithGivenId)
         movieRepository.deleteById(id)
     }
 }

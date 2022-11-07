@@ -1,5 +1,6 @@
 package com.alex.moviebackend.filter
 
+import com.alex.moviebackend.repository.database.user.UserRepository
 import com.alex.moviebackend.repository.database.user.UserService
 import com.alex.moviebackend.util.JwtUtils
 import org.springframework.http.HttpHeaders
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class JwtAuthenticationFilter(
     private val userService: UserService,
+    private val userRepository: UserRepository,
     private val jwtUtils: JwtUtils
 ) : OncePerRequestFilter() {
 
@@ -30,6 +32,8 @@ class JwtAuthenticationFilter(
             val username = jwtUtils.getUsername(token)!!
 
             val userDetails = userService.loadUserByUsername(username)
+
+            request.setAttribute("userId", userRepository.findByUsername(username)!!.id)
 
             val authentication = UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
             authentication.details = WebAuthenticationDetailsSource().buildDetails(request)

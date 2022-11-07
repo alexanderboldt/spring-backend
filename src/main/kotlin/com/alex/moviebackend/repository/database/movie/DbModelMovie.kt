@@ -10,6 +10,8 @@ data class DbModelMovie(
     @GeneratedValue
     val id: Long,
 
+    val userId: Long,
+
     val title: String,
 
     val description: String?,

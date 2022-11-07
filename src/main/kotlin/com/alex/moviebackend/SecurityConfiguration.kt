@@ -5,6 +5,7 @@ import com.alex.moviebackend.filter.ClientSecretAuthorizationFilter
 import com.alex.moviebackend.filter.JwtAuthenticationFilter
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -24,6 +25,9 @@ class SecurityConfiguration(
 
     @Bean
     fun getPasswordEncoder() = BCryptPasswordEncoder()
+
+    @Bean
+    fun getAuthenticationManager(authenticationConfiguration: AuthenticationConfiguration) = authenticationConfiguration.authenticationManager
 
     @Bean
     fun filterChain(httpSecurity: HttpSecurity): SecurityFilterChain {

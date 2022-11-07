@@ -10,6 +10,8 @@ import com.alex.moviebackend.repository.database.user.DbModelUser
 import com.alex.moviebackend.repository.database.user.UserRepository
 import com.alex.moviebackend.repository.mapping.toApiModelGet
 import org.springframework.http.HttpStatus
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -19,7 +21,8 @@ import java.util.*
 class UserController(
     private val userRepository: UserRepository,
     private val jwtUtils: JwtUtils,
-    private val passwordEncoder: BCryptPasswordEncoder
+    private val passwordEncoder: BCryptPasswordEncoder,
+    private val authenticationManager: AuthenticationManager
 ) {
 
     @PostMapping("register")
@@ -36,6 +39,7 @@ class UserController(
 
     @PostMapping("login")
     fun login(@RequestBody request: ApiModelLoginPost): ApiModelLoginGet {
+        authenticationManager.authenticate(UsernamePasswordAuthenticationToken(request.username, request.password))
         return ApiModelLoginGet(jwtUtils.generateToken(request.username))
     }
 }

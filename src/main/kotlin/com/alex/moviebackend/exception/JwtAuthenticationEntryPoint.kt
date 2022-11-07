@@ -12,6 +12,6 @@ import javax.servlet.http.HttpServletResponse
 class JwtAuthenticationEntryPoint : AuthenticationEntryPoint {
 
     override fun commence(request: HttpServletRequest, response: HttpServletResponse, authException: AuthenticationException) {
-        response.error(HttpStatus.UNAUTHORIZED, "Invalid or missing session-token!")
+        response.error(HttpStatus.UNAUTHORIZED, "Invalid authentication")
     }
 }

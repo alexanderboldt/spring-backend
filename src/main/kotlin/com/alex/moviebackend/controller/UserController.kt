@@ -25,11 +25,20 @@ class UserController(
     private val authenticationManager: AuthenticationManager
 ) {
 
+    // minimum eight characters, at least one uppercase letter, one lowercase letter and one number
+    private val regex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$".toRegex()
+
+    // ----------------------------------------------------------------------------
+
     @PostMapping("register")
     @ResponseStatus(HttpStatus.CREATED)
     fun postUser(@RequestBody request: ApiModelRegisterPost): ApiModelUserGet {
         if (userRepository.findByUsername(request.username) != null) {
             throw BadRequestException("User already exist with the given username!")
+        }
+
+        if (!regex.containsMatchIn(request.password)) {
+            throw BadRequestException("Password didn't match the requirements!")
         }
 
         return userRepository

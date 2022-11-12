@@ -1,5 +1,6 @@
 package com.alex.moviebackend.repository.database.review
 
+import com.alex.moviebackend.repository.database.movie.DbModelMovie
 import javax.persistence.*
 
 @Entity
@@ -10,7 +11,8 @@ data class DbModelReview(
 
     val userId: Long,
 
-    val movieId: Long,
+    @ManyToOne
+    val movie: DbModelMovie,
 
     val description: String,
 

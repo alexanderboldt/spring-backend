@@ -45,7 +45,7 @@ class MovieController(
         val movie = movieRepository.findByIdAndUserId(id, userId) ?: throw ResourceNotFoundException(textMovieNotFoundWithGivenId)
 
         return reviewRepository
-            .save(DbModelReview(0, userId, movie.id, request.description, Date().time))
+            .save(DbModelReview(0, userId, movie, request.description, Date().time))
             .toApiModelGet()
     }
 

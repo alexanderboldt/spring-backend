@@ -26,7 +26,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-	implementation("org.postgresql:postgresql:42.5.0")
+	implementation("mysql:mysql-connector-java")
 
 	implementation("org.springframework.security:spring-security-web:5.7.4")
 	implementation("org.springframework.security:spring-security-config:5.7.4")

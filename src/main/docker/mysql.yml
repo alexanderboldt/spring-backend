@@ -1,0 +1,11 @@
+version: '3.8'
+services:
+  mysql:
+    image: mysql:8.0.32
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'admin'
+      MYSQL_PASSWORD: 'admin'
+      MYSQL_ROOT_PASSWORD: 'admin'
+    ports:
+      - 127.0.0.1:3306:3306
